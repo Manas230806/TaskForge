@@ -1,0 +1,38 @@
+{
+  "appId": "com.taskforge.app",
+  "appName": "TaskForge",
+  "webDir": ".",
+  "server": {
+    "androidScheme": "https"
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 2000,
+      "launchAutoHide": true,
+      "backgroundColor": "#0f0f13",
+      "androidSplashResourceName": "splash",
+      "androidScaleType": "CENTER_CROP",
+      "showSpinner": false,
+      "androidSpinnerStyle": "large",
+      "iosSpinnerStyle": "large",
+      "spinnerColor": "#7c6ef7"
+    },
+    "StatusBar": {
+      "style": "DARK"
+    },
+    "LocalNotifications": {
+      "smallIcon": "ic_stat_icon_config_sample",
+      "iconColor": "#7c6ef7",
+      "sound": "beep.wav"
+    }
+  },
+  "android": {
+    "buildOptions": {
+      "keystorePath": "keystore.jks",
+      "keystoreAlias": "taskforge"
+    }
+  },
+  "ios": {
+    "contentInset": "always"
+  }
+}
