@@ -323,6 +323,14 @@ let timers = {};
 
 function save(){ localStorage.setItem('tf_tasks', JSON.stringify(tasks)); }
 
+// ── Check notification permission on load ────────────────────────────────────
+window.addEventListener('load', () => {
+  if('Notification' in window){
+    console.log('Notification permission on load:', Notification.permission);
+    updateNotifBar(Notification.permission);
+  }
+});
+
 // ── Defaults ───────────────────────────────────────────────────────────────
 function setDefaultDate(){
   const d = new Date(); d.setMinutes(d.getMinutes()+30);
@@ -366,8 +374,21 @@ function setSort(s){
 
 // ── Notifications ──────────────────────────────────────────────────────────
 function requestNotifPermission(){
-  if(!('Notification' in window)){ updateNotifBar('denied'); return; }
-  Notification.requestPermission().then(p => updateNotifBar(p));
+  if(!('Notification' in window)){ 
+    updateNotifBar('denied'); 
+    console.log('Notifications not supported'); 
+    return; 
+  }
+  
+  // Request permission on mobile
+  if (Notification.permission === 'default') {
+    Notification.requestPermission().then(p => {
+      console.log('Notification permission:', p);
+      updateNotifBar(p);
+    });
+  } else {
+    updateNotifBar(Notification.permission);
+  }
 }
 function updateNotifBar(perm){
   const bar=document.getElementById('notifBar'), msg=document.getElementById('notifMsg');
@@ -409,29 +430,51 @@ function scheduleReminder(task){
 function fireReminder(task){
   if(task.done) return;
   
-  // Play notification sound
-  playNotificationSound();
+  console.log('Firing reminder for task:', task.title);
   
   // Vibrate on mobile
   if('vibrate' in navigator){
     navigator.vibrate([200, 100, 200]);
+    console.log('Vibration triggered');
+  }
+  
+  // Play notification sound with user interaction fallback
+  try {
+    playNotificationSound();
+  } catch(e) {
+    console.log('Audio error:', e);
   }
   
   if(Notification.permission==='granted'){
-    const n = new Notification('TaskForge Reminder 🔔',{
-      body:task.title,
-      tag:'task-'+task.id,
-      requireInteraction:true,
-      silent:false
-    });
-    n.onclick = () => { window.focus(); n.close(); };
+    try {
+      const n = new Notification('TaskForge Reminder 🔔',{
+        body:task.title,
+        tag:'task-'+task.id,
+        requireInteraction:true,
+        silent:false,
+        icon: 'icon.svg'
+      });
+      n.onclick = () => { window.focus(); n.close(); };
+      console.log('Notification sent successfully');
+    } catch(e) {
+      console.log('Notification error:', e);
+    }
+  } else {
+    console.log('Notification permission not granted:', Notification.permission);
   }
+  
   showToast('⏰ Reminder: ' + task.title, 'reminder');
 }
 
 function playNotificationSound(){
   // Create audio context for better mobile support
   const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  
+  // Resume audio context if suspended (mobile requirement)
+  if (audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
+  
   const oscillator = audioCtx.createOscillator();
   const gainNode = audioCtx.createGain();
   
@@ -445,6 +488,8 @@ function playNotificationSound(){
   oscillator.start();
   gainNode.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 0.5);
   oscillator.stop(audioCtx.currentTime + 0.5);
+  
+  console.log('Sound played');
 }
 function cancelReminder(id){ if(timers[id]){ clearTimeout(timers[id]); delete timers[id]; } }
 function snoozeReminder(id){
