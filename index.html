@@ -20,11 +20,19 @@
   --radius-sm:6px;--radius-md:10px;--radius-lg:16px;
   --font:'Inter','Segoe UI',system-ui,sans-serif;
 }
+.light-mode{
+  --app-bg:#ffffff;--card:#f5f5f7;--card2:#e8e8ed;--border1:#d1d1d6;--border2:#c7c7cc;
+  --accent:#7c6ef7;--accent2:#a78bfa;--accent3:#c4b5fd;
+  --success:#22d3a0;--danger:#f87171;--warning:#fbbf24;
+  --text1:#1d1d1f;--text2:#000000;--text3:#86868b;
+}
 body{font-family:var(--font);background:var(--app-bg);color:var(--text1);min-height:100vh;overflow-x:hidden}
 
 .app-shell{display:flex;flex-direction:column;min-height:100vh;transition:background .4s cubic-bezier(.4,0,.2,1)}
 .app-shell.epic-mode{background:linear-gradient(135deg,#0d0d1a 0%,#150d2e 40%,#0d1a26 100%)}
 .app-shell.immersive-mode{background:#0a1628}
+.light-mode.app-shell.epic-mode{background:linear-gradient(135deg,#f5f0ff 0%,#e8e0ff 40%,#f0e8ff 100%)}
+.light-mode.app-shell.immersive-mode{background:#e8f0ff}
 
 /* ── Top Bar ─────────────────────────────── */
 .topbar{display:flex;align-items:center;gap:12px;padding:14px 24px;background:rgba(255,255,255,.03);border-bottom:1px solid var(--border1);position:sticky;top:0;z-index:50;backdrop-filter:blur(8px)}
@@ -209,6 +217,7 @@ body{font-family:var(--font);background:var(--app-bg);color:var(--text1);min-hei
       <div class="stat-chip"><i class="ti ti-bell" style="font-size:12px;color:var(--accent2)"></i><span id="statRem">0</span> reminders</div>
     </div>
     <div class="mode-badges">
+      <button class="mode-btn" id="btnTheme" onclick="toggleTheme()">🌙</button>
       <button class="mode-btn" id="btnNormal" onclick="setMode('normal')">Normal</button>
       <button class="mode-btn" id="btnEpic" onclick="setMode('epic')">⚡ Epic</button>
       <button class="mode-btn" id="btnImm" onclick="setMode('immersive')">🌊 Immersive</button>
@@ -320,6 +329,7 @@ let tasks = JSON.parse(localStorage.getItem('tf_tasks') || 'null') || [
 let nextId = Math.max(0,...tasks.map(t=>t.id)) + 1;
 let mode = 'normal', filter = 'all', sort = 'date', selPri = 'low';
 let timers = {};
+let isLightMode = localStorage.getItem('tf_theme') === 'light';
 
 function save(){ localStorage.setItem('tf_tasks', JSON.stringify(tasks)); }
 
@@ -329,7 +339,20 @@ window.addEventListener('load', () => {
     console.log('Notification permission on load:', Notification.permission);
     updateNotifBar(Notification.permission);
   }
+  // Apply saved theme
+  if(isLightMode){
+    document.body.classList.add('light-mode');
+    document.getElementById('btnTheme').textContent = '☀️';
+  }
 });
+
+// ── Theme Toggle ─────────────────────────────────────────────────────────────
+function toggleTheme(){
+  isLightMode = !isLightMode;
+  document.body.classList.toggle('light-mode', isLightMode);
+  document.getElementById('btnTheme').textContent = isLightMode ? '☀️' : '🌙';
+  localStorage.setItem('tf_theme', isLightMode ? 'light' : 'dark');
+}
 
 // ── Defaults ───────────────────────────────────────────────────────────────
 function setDefaultDate(){
