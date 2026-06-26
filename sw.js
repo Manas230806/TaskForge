@@ -1,8 +1,10 @@
-const CACHE_NAME = 'taskforge-v1';
+const CACHE_NAME = 'taskforge-v2';
 const ASSETS = [
   '/',
   '/index.html',
   '/manifest.json',
+  '/icon.svg',
+  '/splash.html',
   'https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css'
 ];
 
