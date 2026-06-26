@@ -348,10 +348,14 @@ window.addEventListener('load', () => {
 
 // ── Theme Toggle ─────────────────────────────────────────────────────────────
 function toggleTheme(){
+  console.log('Toggle theme called, current isLightMode:', isLightMode);
   isLightMode = !isLightMode;
+  console.log('New isLightMode:', isLightMode);
   document.body.classList.toggle('light-mode', isLightMode);
+  console.log('Body classes:', document.body.classList);
   document.getElementById('btnTheme').textContent = isLightMode ? '☀️' : '🌙';
   localStorage.setItem('tf_theme', isLightMode ? 'light' : 'dark');
+  console.log('Theme saved to localStorage:', localStorage.getItem('tf_theme'));
 }
 
 // ── Defaults ───────────────────────────────────────────────────────────────
