@@ -2,7 +2,7 @@
   "name": "TaskForge",
   "short_name": "TaskForge",
   "description": "A powerful to-do app with reminders and focus modes",
-  "start_url": "/index.html",
+  "start_url": "/splash.html",
   "display": "standalone",
   "background_color": "#0f0f13",
   "theme_color": "#7c6ef7",
